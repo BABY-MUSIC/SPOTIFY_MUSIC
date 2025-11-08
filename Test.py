@@ -227,20 +227,24 @@ async def stop_cmd(_, m: Message):
 async def main():
     print("🛠 Debug: Starting Bot and User client...")
     await bot.start()
-    print(f"✅ Bot started! Username: {(await bot.get_me()).username}")
+    print(f"✅  Bot started! Username: {(await bot.get_me()).username}")
     await user.start()
-    print(f"✅ User (StringSession) started! Username: {(await user.get_me()).username}")
+    print(f"✅  User (StringSession) started! Username: {(await user.get_me()).username}")
     await vc.start()
-    print("✅ PyTgCalls started successfully")
+    print("✅  PyTgCalls started successfully")
+
     if OWNER_ID:
         try:
             await bot.send_message(OWNER_ID, "🚀 Music Bot started successfully!")
         except Exception as e:
             print("🛠 Debug: Failed to send start message to owner:", e)
-    print("🛠 Debug: Bot and User clients initialized and running.")
-    await asyncio.get_event_loop().create_future()
 
-if __name__=="__main__":
+    print("🛠 Debug: Entering idle mode, waiting for commands...")
+    from pyrogram import idle
+    await idle()
+
+
+if __name__ == "__main__":
     try:
         import uvloop
         uvloop.install()
