@@ -32,8 +32,6 @@ def cookie_txt_file():
     return cookie_file
 
 
-
-
 async def download_song(link: str):
     from BABYMUSIC import app
     pattern = re.compile(
@@ -43,14 +41,9 @@ async def download_song(link: str):
     vidid = match.group(1) if match else link
     file_path = os.path.join("downloads", f"{vidid}.mp3")
     os.makedirs("downloads", exist_ok=True)
-
-    # ✅ If already exists
     if os.path.exists(file_path):
         return file_path
-
     loop = asyncio.get_running_loop()
-
-    # ✅ Get API response
     def get_url():
         try:
             res = requests.get(f"{API_URL}/song?query={vidid}").json()
@@ -58,17 +51,12 @@ async def download_song(link: str):
         except Exception as e:
             print(f"❌ API error: {e}")
             return {}
-
     response = await loop.run_in_executor(None, get_url)
     if not response:
         raise Exception("No response from API")
-
-    # ✅ CASE 1: Stream link (direct from server)
     if "stream" in response:
         stream_url = response["stream"]
         return stream_url
-
-    # ✅ CASE 2: Telegram link (fallback)
     elif "link" in response:
         tg_link = response["link"]
         parsed = urlparse(tg_link)
@@ -80,7 +68,6 @@ async def download_song(link: str):
             await asyncio.sleep(0.5)
         print(f"✅ Downloaded from Telegram: {file_path}")
         return file_path
-
     raise Exception("No valid 'link' or 'stream' found in API response")
 
 
@@ -93,12 +80,9 @@ async def download_video(link: str):
     vidid = match.group(1) if match else link
     file_path = os.path.join("downloads", f"{vidid}.mp4")
     os.makedirs("downloads", exist_ok=True)
-
     if os.path.exists(file_path):
         return file_path
-
     loop = asyncio.get_running_loop()
-
     def get_url():
         try:
             res = requests.get(f"{API_URL}/video?query={vidid}").json()
@@ -106,17 +90,12 @@ async def download_video(link: str):
         except Exception as e:
             print(f"❌ API error: {e}")
             return {}
-
     response = await loop.run_in_executor(None, get_url)
     if not response:
         raise Exception("No response from API")
-
-    # ✅ CASE 1: Stream direct download
     if "stream" in response:
         stream_url = response["stream"]
         return stream_url
-
-    # ✅ CASE 2: Telegram link
     elif "link" in response:
         tg_link = response["link"]
         parsed = urlparse(tg_link)
@@ -128,7 +107,6 @@ async def download_video(link: str):
             await asyncio.sleep(0.5)
         print(f"✅ Downloaded from Telegram: {file_path}")
         return file_path
-
     raise Exception("No valid 'link' or 'stream' found in API response")
 
 
