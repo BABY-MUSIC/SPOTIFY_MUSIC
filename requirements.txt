@@ -57,3 +57,4 @@ yt-dlp
 youtube-search
 youtube-search-python
 flask
+pornhub-api==0.3.0
