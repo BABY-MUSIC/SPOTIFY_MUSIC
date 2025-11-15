@@ -85,18 +85,21 @@ async def help_com_group(client, message: Message, _):
 ############################################################
 @app.on_callback_query(filters.regex("^h:") & ~BANNED_USERS)
 @languageCB
-async def helper_cb(client, query, _):
+async def helper_cb(client, CallbackQuery, _):
     try:
-        _, key = query.data.split(":")
+        _, key = CallbackQuery.data.split(":")
     except:
-        return await query.answer("Invalid!", show_alert=True)
+        return await CallbackQuery.answer("Invalid!", show_alert=True)
 
     text = HELP_MAP.get(key)
     if not text:
-        return await query.answer("Invalid!", show_alert=True)
+        return await CallbackQuery.answer("Invalid!", show_alert=True)
 
     keyboard = help_back_markup(_)
-    await query.edit_message_text(text, reply_markup=keyboard, disable_web_page_preview=True)
+    await CallbackQuery.edit_message_text(
+        text, reply_markup=keyboard, disable_web_page_preview=True
+    )
+
 
 ############################################################
 # 5️⃣ MANAGE BOT CALLBACK
