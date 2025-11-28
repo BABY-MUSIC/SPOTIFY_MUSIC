@@ -19,8 +19,6 @@ import config
 from config import API_URL
 from urllib.parse import urlparse
 
-
-
 def cookie_txt_file():
     cookie_dir = f"{os.getcwd()}/cookies"
     if not os.path.exists(cookie_dir):
@@ -31,9 +29,7 @@ def cookie_txt_file():
     cookie_file = os.path.join(cookie_dir, random.choice(cookies_files))
     return cookie_file
 
-
 async def download_song(link: str):
-    from BABYMUSIC import app
     pattern = re.compile(
         r"(?:https?://)?(?:www\.)?(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|youtu\.be/)([A-Za-z0-9_-]{11})"
     )
@@ -57,22 +53,10 @@ async def download_song(link: str):
     if "stream" in response:
         stream_url = response["stream"]
         return stream_url
-    elif "link" in response:
-        tg_link = response["link"]
-        parsed = urlparse(tg_link)
-        parts = parsed.path.strip("/").split("/")
-        cname, msgid = str(parts[0]), int(parts[1])
-        msg = await app.get_messages(cname, msgid)
-        await msg.download(file_name=file_path)
-        while not os.path.exists(file_path):
-            await asyncio.sleep(0.5)
-        print(f"✅ Downloaded from Telegram: {file_path}")
-        return file_path
-    raise Exception("No valid 'link' or 'stream' found in API response")
+    raise Exception("Unable to access API 💁")
 
 
 async def download_video(link: str):
-    from BABYMUSIC import app
     pattern = re.compile(
         r"(?:https?://)?(?:www\.)?(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|youtu\.be/)([A-Za-z0-9_-]{11})"
     )
@@ -96,18 +80,7 @@ async def download_video(link: str):
     if "stream" in response:
         stream_url = response["stream"]
         return stream_url
-    elif "link" in response:
-        tg_link = response["link"]
-        parsed = urlparse(tg_link)
-        parts = parsed.path.strip("/").split("/")
-        cname, msgid = str(parts[0]), int(parts[1])
-        msg = await app.get_messages(cname, msgid)
-        await msg.download(file_name=file_path)
-        while not os.path.exists(file_path):
-            await asyncio.sleep(0.5)
-        print(f"✅ Downloaded from Telegram: {file_path}")
-        return file_path
-    raise Exception("No valid 'link' or 'stream' found in API response")
+    raise Exception("Unable to access API 💁")
 
 
 async def check_file_size(link):
