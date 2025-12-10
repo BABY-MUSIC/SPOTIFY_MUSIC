@@ -9,6 +9,7 @@ from BABYMUSIC.utils.database import get_loop
 from BABYMUSIC.utils.decorators import AdminRightsCheck
 from BABYMUSIC.utils.inline import close_markup, stream_markup
 from BABYMUSIC.utils.stream.autoclear import auto_clean
+from BABYMUSIC.utils.thumbnails import get_thumb
 from config import BANNED_USERS
 
 
@@ -47,7 +48,7 @@ async def skip(cli, message: Message, _, chat_id):
                                         ),
                                         reply_markup=close_markup(_),
                                     )
-                                    await BABY.stop_stream(chat_id)
+                                    await Sagar.stop_stream(chat_id)
                                 except:
                                     return
                                 break
@@ -74,7 +75,7 @@ async def skip(cli, message: Message, _, chat_id):
                     reply_markup=close_markup(_),
                 )
                 try:
-                    return await BABY.stop_stream(chat_id)
+                    return await Sagar.stop_stream(chat_id)
                 except:
                     return
         except:
@@ -85,7 +86,7 @@ async def skip(cli, message: Message, _, chat_id):
                     ),
                     reply_markup=close_markup(_),
                 )
-                return await BABY.stop_stream(chat_id)
+                return await Sagar.stop_stream(chat_id)
             except:
                 return
     queued = check[0]["file"]
@@ -110,11 +111,14 @@ async def skip(cli, message: Message, _, chat_id):
         except:
             image = None
         try:
-            await BABY.skip_stream(chat_id, link, video=status, image=image)
+            await Sagar.skip_stream(chat_id, link, video=status, image=image)
         except:
             return await message.reply_text(_["call_6"])
         button = stream_markup(_, chat_id)
-        run = await message.reply_(
+        img = await get_thumb(videoid, chat_id=chat_id)
+        run = await message.reply_photo(
+            photo=img,
+            has_spoiler=True,
             caption=_["stream_1"].format(
                 f"https://t.me/{app.username}?start=info_{videoid}",
                 title[:23],
@@ -141,12 +145,15 @@ async def skip(cli, message: Message, _, chat_id):
         except:
             image = None
         try:
-            await BABY.skip_stream(chat_id, file_path, video=status, image=image)
+            await Sagar.skip_stream(chat_id, file_path, video=status, image=image)
         except:
             return await mystic.edit_text(_["call_6"])
         button = stream_markup(_, chat_id)
-        run = await message.reply_text(
-            text=_["stream_1"].format(
+        img = await get_thumb(videoid, chat_id=chat_id)
+        run = await message.reply_photo(
+            photo=img,
+            has_spoiler=True,
+            caption=_["stream_1"].format(
                 f"https://t.me/{app.username}?start=info_{videoid}",
                 title[:23],
                 check[0]["dur"],
@@ -159,7 +166,7 @@ async def skip(cli, message: Message, _, chat_id):
         await mystic.delete()
     elif "index_" in queued:
         try:
-            await BABY.skip_stream(chat_id, videoid, video=status)
+            await Sagar.skip_stream(chat_id, videoid, video=status)
         except:
             return await message.reply_text(_["call_6"])
         button = stream_markup(_, chat_id)
@@ -167,6 +174,7 @@ async def skip(cli, message: Message, _, chat_id):
             photo=config.STREAM_IMG_URL,
             caption=_["stream_2"].format(user),
             reply_markup=InlineKeyboardMarkup(button),
+            has_spoiler=True,
         )
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "tg"
@@ -181,7 +189,7 @@ async def skip(cli, message: Message, _, chat_id):
             except:
                 image = None
         try:
-            await BABY.skip_stream(chat_id, queued, video=status, image=image)
+            await Sagar.skip_stream(chat_id, queued, video=status, image=image)
         except:
             return await message.reply_text(_["call_6"])
         if videoid == "telegram":
@@ -212,8 +220,11 @@ async def skip(cli, message: Message, _, chat_id):
             db[chat_id][0]["markup"] = "tg"
         else:
             button = stream_markup(_, chat_id)
-            run = await message.reply_text(
-                text=_["stream_1"].format(
+            img = await get_thumb(videoid, chat_id=chat_id)
+            run = await message.reply_photo(
+                photo=img,
+                has_spoiler=True,
+                caption=_["stream_1"].format(
                     f"https://t.me/{app.username}?start=info_{videoid}",
                     title[:23],
                     check[0]["dur"],
@@ -223,3 +234,7 @@ async def skip(cli, message: Message, _, chat_id):
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "stream"
+
+
+
+
