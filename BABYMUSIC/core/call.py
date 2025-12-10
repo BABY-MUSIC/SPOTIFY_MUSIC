@@ -35,6 +35,7 @@ from BABYMUSIC.utils.exceptions import AssistantErr
 from BABYMUSIC.utils.formatters import check_duration, seconds_to_min, speed_converter
 from BABYMUSIC.utils.inline.play import stream_markup
 from BABYMUSIC.utils.stream.autoclear import auto_clean
+from BABYMUSIC.utils.thumbnails import get_thumb
 from strings import get_string
 
 autoend = {}
@@ -59,6 +60,7 @@ class Call(PyTgCalls):
             self.userbot1,
             cache_duration=150,
         )
+
 
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
@@ -130,14 +132,14 @@ class Call(PyTgCalls):
         stream = (
             AudioVideoPiped(
                 out,
-                audio_parameters=MediumQualityAudio(),
-                video_parameters=LowQualityVideo(),
+                audio_parameters=HighQualityAudio(),
+                video_parameters=MediumQualityVideo(),
                 additional_ffmpeg_parameters=f"-ss {played} -to {duration}",
             )
             if playing[0]["streamtype"] == "video"
             else AudioPiped(
                 out,
-                audio_parameters=LowQualityVideo(),
+                audio_parameters=HighQualityAudio(),
                 additional_ffmpeg_parameters=f"-ss {played} -to {duration}",
             )
         )
@@ -181,11 +183,11 @@ class Call(PyTgCalls):
         if video:
             stream = AudioVideoPiped(
                 link,
-                audio_parameters=MediumQualityAudio(),
-                video_parameters=LowQualityVideo(),
+                audio_parameters=HighQualityAudio(),
+                video_parameters=MediumQualityVideo(),
             )
         else:
-            stream = AudioPiped(link, audio_parameters=MediumQualityAudio())
+            stream = AudioPiped(link, audio_parameters=HighQualityAudio())
         await assistant.change_stream(
             chat_id,
             stream,
@@ -196,14 +198,14 @@ class Call(PyTgCalls):
         stream = (
             AudioVideoPiped(
                 file_path,
-                audio_parameters=MediumQualityAudio(),
-                video_parameters=LowQualityVideo(),
+                audio_parameters=HighQualityAudio(),
+                video_parameters=MediumQualityVideo(),
                 additional_ffmpeg_parameters=f"-ss {to_seek} -to {duration}",
             )
             if mode == "video"
             else AudioPiped(
                 file_path,
-                audio_parameters=MediumQualityAudio(),
+                audio_parameters=HighQualityAudio(),
                 additional_ffmpeg_parameters=f"-ss {to_seek} -to {duration}",
             )
         )
@@ -233,18 +235,18 @@ class Call(PyTgCalls):
         if video:
             stream = AudioVideoPiped(
                 link,
-                audio_parameters=MediumQualityAudio(),
-                video_parameters=LowQualityVideo(),
+                audio_parameters=HighQualityAudio(),
+                video_parameters=MediumQualityVideo(),
             )
         else:
             stream = (
                 AudioVideoPiped(
                     link,
-                    audio_parameters=MediumQualityAudio(),
-                    video_parameters=LowQualityVideo(),
+                    audio_parameters=HighQualityAudio(),
+                    video_parameters=MediumQualityVideo(),
                 )
                 if video
-                else AudioPiped(link, audio_parameters=MediumQualityAudio())
+                else AudioPiped(link, audio_parameters=HighQualityAudio())
             )
         try:
             await assistant.join_group_call(
@@ -315,13 +317,13 @@ class Call(PyTgCalls):
                 if video:
                     stream = AudioVideoPiped(
                         link,
-                        audio_parameters=MediumQualityAudio(),
-                        video_parameters=LowQualityVideo(),
+                        audio_parameters=HighQualityAudio(),
+                        video_parameters=MediumQualityVideo(),
                     )
                 else:
                     stream = AudioPiped(
                         link,
-                        audio_parameters=MediumQualityAudio(),
+                        audio_parameters=HighQualityAudio(),
                     )
                 try:
                     await client.change_stream(chat_id, stream)
@@ -330,10 +332,12 @@ class Call(PyTgCalls):
                         original_chat_id,
                         text=_["call_6"],
                     )
-                button = telegram_markup(_, chat_id)
-                run = await app.send_text(
+                img = await get_thumb(videoid, chat_id=chat_id)
+                button = stream_markup(_, chat_id)
+                run = await app.send_photo(
                     chat_id=original_chat_id,
-                    text=_["stream_1"].format(
+                    photo=img,
+                    caption=_["stream_1"].format(
                         f"https://t.me/{app.username}?start=info_{videoid}",
                         title[:23],
                         check[0]["dur"],
@@ -353,27 +357,19 @@ class Call(PyTgCalls):
                         video=True if str(streamtype) == "video" else False,
                     )
                 except:
-                    try:
-                        file_path, direct = await YTB.download(
-                            videoid,
-                            mystic,
-                            videoid=True,
-                            video=True if str(streamtype) == "video" else False,
-                        )
-                    except:
-                        return await mystic.edit_text(
-                            _["call_6"], disable_web_page_preview=True
-                        )
+                    return await mystic.edit_text(
+                        _["call_6"], disable_web_page_preview=True
+                    )
                 if video:
                     stream = AudioVideoPiped(
                         file_path,
-                        audio_parameters=MediumQualityAudio(),
-                        video_parameters=LowQualityVideo(),
+                        audio_parameters=HighQualityAudio(),
+                        video_parameters=MediumQualityVideo(),
                     )
                 else:
                     stream = AudioPiped(
                         file_path,
-                        audio_parameters=MediumQualityAudio(),
+                        audio_parameters=HighQualityAudio(),
                     )
                 try:
                     await client.change_stream(chat_id, stream)
@@ -382,12 +378,13 @@ class Call(PyTgCalls):
                         original_chat_id,
                         text=_["call_6"],
                     )
-                img = await get_thumb(videoid)
-                button = stream_markup(_, videoid, chat_id)
+                img = await get_thumb(videoid, chat_id=chat_id)
+                button = stream_markup(_, chat_id)
                 await mystic.delete()
-                run = await app.send_text(
+                run = await app.send_photo(
                     chat_id=original_chat_id,
-                    text=_["stream_1"].format(
+                    photo=img,
+                    caption=_["stream_1"].format(
                         f"https://t.me/{app.username}?start=info_{videoid}",
                         title[:23],
                         check[0]["dur"],
@@ -401,11 +398,11 @@ class Call(PyTgCalls):
                 stream = (
                     AudioVideoPiped(
                         videoid,
-                        audio_parameters=MediumQualityAudio(),
-                        video_parameters=LowQualityVideo(),
+                        audio_parameters=HighQualityAudio(),
+                        video_parameters=MediumQualityVideo(),
                     )
                     if str(streamtype) == "video"
-                    else AudioPiped(videoid, audio_parameters=MediumQualityAudio())
+                    else AudioPiped(videoid, audio_parameters=HighQualityAudio())
                 )
                 try:
                     await client.change_stream(chat_id, stream)
@@ -414,7 +411,7 @@ class Call(PyTgCalls):
                         original_chat_id,
                         text=_["call_6"],
                     )
-                button = telegram_markup(_, chat_id)
+                button = stream_markup(_, chat_id)
                 run = await app.send_photo(
                     chat_id=original_chat_id,
                     photo=config.STREAM_IMG_URL,
@@ -427,13 +424,13 @@ class Call(PyTgCalls):
                 if video:
                     stream = AudioVideoPiped(
                         queued,
-                        audio_parameters=MediumQualityAudio(),
-                        video_parameters=LowQualityVideo(),
+                        audio_parameters=HighQualityAudio(),
+                        video_parameters=MediumQualityVideo(),
                     )
                 else:
                     stream = AudioPiped(
                         queued,
-                        audio_parameters=MediumQualityAudio(),
+                        audio_parameters=HighQualityAudio(),
                     )
                 try:
                     await client.change_stream(chat_id, stream)
@@ -443,14 +440,12 @@ class Call(PyTgCalls):
                         text=_["call_6"],
                     )
                 if videoid == "telegram":
-                    button = telegram_markup(_, chat_id)
+                    button = stream_markup(_, chat_id)
                     run = await app.send_photo(
                         chat_id=original_chat_id,
-                        photo=(
-                            config.TELEGRAM_AUDIO_URL
-                            if str(streamtype) == "audio"
-                            else config.TELEGRAM_VIDEO_URL
-                        ),
+                        photo=config.TELEGRAM_AUDIO_URL
+                        if str(streamtype) == "audio"
+                        else config.TELEGRAM_VIDEO_URL,
                         caption=_["stream_1"].format(
                             config.SUPPORT_CHAT, title[:23], check[0]["dur"], user
                         ),
@@ -459,7 +454,7 @@ class Call(PyTgCalls):
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "tg"
                 elif videoid == "soundcloud":
-                    button = telegram_markup(_, chat_id)
+                    button = stream_markup(_, chat_id)
                     run = await app.send_photo(
                         chat_id=original_chat_id,
                         photo=config.SOUNCLOUD_IMG_URL,
@@ -471,10 +466,12 @@ class Call(PyTgCalls):
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "tg"
                 else:
+                    img = await get_thumb(videoid, chat_id=chat_id)
                     button = stream_markup(_, chat_id)
-                    run = await app.send_message(
+                    run = await app.send_photo(
                         chat_id=original_chat_id,
-                        text=_["stream_1"].format(
+                        photo=img,
+                        caption=_["stream_1"].format(
                             f"https://t.me/{app.username}?start=info_{videoid}",
                             title[:23],
                             check[0]["dur"],
