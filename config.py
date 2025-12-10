@@ -9,10 +9,10 @@ from pyrogram import filters
 load_dotenv()
 # ------------------------------------
 # -----------------------------------------------------
-API_ID = int(getenv("API_ID", "16457832"))
-API_HASH = getenv("API_HASH", "3030874d0befdb5d05597deacc3e83ab")
+API_ID = int(getenv("API_ID", "0"))
+API_HASH = getenv("API_HASH", "0")
 # ------------------------------------------------------
-BOT_TOKEN = getenv("BOT_TOKEN", "7985004218:AAH8kg8aHfg-_7XFTwHaswRliUBy-pDn6bU")
+BOT_TOKEN = getenv("BOT_TOKEN", "0")
 # -------------------------------------------------------
 OWNER_USERNAME = getenv("OWNER_USERNAME","@UTTAM470")
 # --------------------------------------------------------
@@ -39,10 +39,10 @@ DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 17000))
 # ----------------------------------------------------------------
 
 # ----------------------------------------------------------------
-LOGGER_ID = (getenv("LOGGER_ID", "YoutubeLogger"))
+LOGGER_ID = int(getenv("LOGGER_ID", "0"))
 # ----------------------------------------------------------------
 # ----------------------------------------------------------------
-OWNER_ID = int(getenv("OWNER_ID", "6657539971"))
+OWNER_ID = int(getenv("OWNER_ID", "0"))
 # -----------------------------------------------------------------
 # -----------------------------------------------------------------
 # config.py
@@ -120,7 +120,7 @@ TG_VIDEO_FILESIZE_LIMIT = int(getenv("TG_VIDEO_FILESIZE_LIMIT", "5242880000"))
 # ------------------------------------
 # ------------------------------------
 # ------------------------------------
-STRING1 = getenv("STRING_SESSION", "BQD7IGgAtxZ8V_AL1-LkdTW4zixbDlnGWh8-1GsQueaumreHIZj77EO8gLspTlLzR6B6YkXC1f7Y5UdsVUnqw4B2OdK8HY22nN_814sT4_9sib9SXLM_68kpmRjXC-QoE-tGZLFzEK4aM7aRyO5_TErtjuLEfiYZ4ZVSh1qIdepcS_NwKRBkruiMiNvVop_vuC-KAKv1f0NbTS51moGPu8Kz0FSghDeku1FPefrfBexNLh_afunsqFSuojxpafyQP7s-X6HyiLmgtoPk0U1Z8xH85ceNiXEYYGgsW0c4r0XhCCHtujuLAjLoVH6BRjxHYCIg0TukNXVP9-2pvaFApuF0kl6XNAAAAAHvMihsAA")
+STRING1 = getenv("STRING_SESSION", "")
 BANNED_USERS = filters.user()
 adminlist = {}
 lyrical = {}
