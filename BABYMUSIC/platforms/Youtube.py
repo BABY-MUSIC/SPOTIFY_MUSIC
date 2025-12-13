@@ -49,20 +49,16 @@ async def download_song(link: str):
         if not res or not res.get("stream"):
             raise Exception("Song stream not found")
         stream_url = res["stream"]
-        for _ in range(60):  # ~2 minutes max
+        for _ in range(60):
             async with session.get(stream_url) as r:
                 if r.status == 200:
-                    # ✅ playable
                     return stream_url
                 elif r.status == 202:
-                    # ⏳ still processing
                     await asyncio.sleep(2)
                     continue
                 else:
                     raise Exception(f"Stream failed ({r.status})")
-
         raise Exception("Song processing timeout")
-
     except Exception as e:
         await app.send_message(
             LOGGER_ID,
@@ -78,28 +74,20 @@ async def download_song(link: str):
 async def download_video(link: str):
     vid = link.split("v=")[-1].split("&")[0]
     os.makedirs("downloads", exist_ok=True)
-
-    # 🔁 local cache (unchanged)
     for ext in ["mp4", "webm", "mkv"]:
         path = f"downloads/{vid}.{ext}"
         if os.path.exists(path):
             return path
-
     try:
         async with aiohttp.ClientSession() as session:
-            # 1️⃣ start video request (same as before)
             async with session.get(
                 f"{BASE_URL}/api/video?query={vid}&api={API_KEY}"
             ) as resp:
                 res = await resp.json()
-
         if not res or not res.get("stream"):
             raise Exception("Video stream nahi mili")
-
         stream_url = res["stream"]
-
-        # 🔥 NEW: wait until stream playable
-        for _ in range(90):  # video thoda zyada time le sakta hai
+            _ fo  _ in ran:  90):
             async with session.get(stream_url) as r:
                 if r.status == 200:
                     return stream_url
