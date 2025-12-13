@@ -31,60 +31,57 @@ def cookie_txt_file():
     cookie_file = os.path.join(cookie_dir, random.choice(cookies_files))
     return cookie_file
 
+
 # ---------- AUDIO ----------
 async def download_song(link: str):
+    vid = link.split("v=")[-1].split("&")[0]
+    os.makedirs("downloads", exist_ok=True)
+    for ext in ["mp3", "m4a", "webm"]:
+        path = f"downloads/{vid}.{ext}"
+        if os.path.exists(path):
+            return path
     try:
-        vid = link.split("v=")[-1].split("&")[0]
-        os.makedirs("downloads", exist_ok=True)
-        for ext in ["mp3", "m4a", "webm"]:
-            path = f"downloads/{vid}.{ext}"
-            if os.path.exists(path):
-                return path
-        loop = asyncio.get_running_loop()
-        fetch = lambda: requests.get(
-            f"{BASE_URL}/api/song?query={vid}&api={API_KEY}",
-            timeout=15
-        ).json()
-        res = await loop.run_in_executor(None, fetch)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"{BASE_URL}/api/song?query={vid}&api={API_KEY}"
+            ) as resp:
+                res = await resp.json()
         if not res or not res.get("stream"):
-            raise Exception("Song API se stream nahi mili")
+            raise Exception("Song stream nahi mili")
         return res["stream"]
     except Exception as e:
         await app.send_message(
             LOGGER_ID,
-            f"❌ **Song Download Error**\n\n"
-            f"🔗 Link: `{link}`\n"
-            f"🆔 Video ID: `{vid}`\n"
-            f"⚠️ Error: `{e}`"
+            f"❌ **Song API Error**\n\n"
+            f"🔗 `{link}`\n"
+            f"⚠️ `{e}`"
         )
         raise
 
 
 # ---------- VIDEO ----------
 async def download_video(link: str):
+    vid = link.split("v=")[-1].split("&")[0]
+    os.makedirs("downloads", exist_ok=True)
+    for ext in ["mp4", "webm", "mkv"]:
+        path = f"downloads/{vid}.{ext}"
+        if os.path.exists(path):
+            return path
     try:
-        vid = link.split("v=")[-1].split("&")[0]
-        os.makedirs("downloads", exist_ok=True)
-        for ext in ["mp4", "webm", "mkv"]:
-            path = f"downloads/{vid}.{ext}"
-            if os.path.exists(path):
-                return path
-        loop = asyncio.get_running_loop()
-        fetch = lambda: requests.get(
-            f"{BASE_URL}/api/video?query={vid}&api={API_KEY}",
-            timeout=15
-        ).json()
-        res = await loop.run_in_executor(None, fetch)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"{BASE_URL}/api/video?query={vid}&api={API_KEY}"
+            ) as resp:
+                res = await resp.json()
         if not res or not res.get("stream"):
-            raise Exception("Video API se stream nahi mili")
+            raise Exception("Video stream nahi mili")
         return res["stream"]
     except Exception as e:
         await app.send_message(
             LOGGER_ID,
-            f"❌ **Video Download Error**\n\n"
-            f"🔗 Link: `{link}`\n"
-            f"🆔 Video ID: `{vid}`\n"
-            f"⚠️ Error: `{e}`"
+            f"❌ **Video API Error**\n\n"
+            f"🔗 `{link}`\n"
+            f"⚠️ `{e}`"
         )
         raise
 
