@@ -92,12 +92,10 @@ async def download_video(link: str):
                 if r.status == 200:
                     return stream_url
                 elif r.status == 202:
-                    await asyncio.sleep(3)
+                    await asyncio.sleep(2)
                 else:
                     raise Exception(f"Stream failed ({r.status})")
-
         raise Exception("Video processing timeout")
-
     except Exception as e:
         await app.send_message(
             LOGGER_ID,
