@@ -85,7 +85,7 @@ async def download_video(link: str):
             ) as resp:
                 res = await resp.json()
         if not res or not res.get("stream"):
-            raise Exception("Video stream nahi mili")
+            raise Exception("Video stream not found")
         stream_url = res["stream"]
             _ fo  _ in ran:  90):
             async with session.get(stream_url) as r:
