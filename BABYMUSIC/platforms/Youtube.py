@@ -33,10 +33,12 @@ def cookie_txt_file():
 
 
 # ---------- AUDIO ----------
+
 async def download_song(link: str):
     vid = link.split("v=")[-1].split("&")[0]
     os.makedirs("downloads", exist_ok=True)
 
+    # 🔁 Local cache (unchanged)
     for ext in ["mp3", "m4a", "webm"]:
         path = f"downloads/{vid}.{ext}"
         if os.path.exists(path):
@@ -45,7 +47,7 @@ async def download_song(link: str):
     try:
         async with aiohttp.ClientSession() as session:
 
-            # 1️⃣ start song job
+            # 1️⃣ Start song job
             async with session.get(
                 f"{BASE_URL}/api/song?query={vid}&api={API_KEY}"
             ) as resp:
@@ -56,13 +58,19 @@ async def download_song(link: str):
 
             stream_url = res["stream"]
 
-            # 2️⃣ poll stream (SESSION OPEN hai)
-            for _ in range(60):
+            # 2️⃣ Poll stream until playable
+            for _ in range(60):  # ~2 minutes max
                 async with session.get(stream_url) as r:
+
                     if r.status == 200:
+                        # ✅ STREAM PLAYABLE
                         return stream_url
-                    elif r.status == 202:
+
+                    elif r.status in (202, 404):
+                        # ⏳ Processing / race condition
                         await asyncio.sleep(2)
+                        continue
+
                     else:
                         raise Exception(f"Stream failed ({r.status})")
 
@@ -85,6 +93,7 @@ async def download_video(link: str):
     vid = link.split("v=")[-1].split("&")[0]
     os.makedirs("downloads", exist_ok=True)
 
+    # 🔁 Local cache (unchanged)
     for ext in ["mp4", "webm", "mkv"]:
         path = f"downloads/{vid}.{ext}"
         if os.path.exists(path):
@@ -93,6 +102,7 @@ async def download_video(link: str):
     try:
         async with aiohttp.ClientSession() as session:
 
+            # 1️⃣ Start video job
             async with session.get(
                 f"{BASE_URL}/api/video?query={vid}&api={API_KEY}"
             ) as resp:
@@ -103,12 +113,18 @@ async def download_video(link: str):
 
             stream_url = res["stream"]
 
-            for _ in range(90):
+            # 2️⃣ Poll stream until playable
+            for _ in range(90):  # video zyada time le sakta hai
                 async with session.get(stream_url) as r:
+
                     if r.status == 200:
+                        # ✅ STREAM PLAYABLE
                         return stream_url
-                    elif r.status == 202:
+
+                    elif r.status in (202, 404):
                         await asyncio.sleep(3)
+                        continue
+
                     else:
                         raise Exception(f"Stream failed ({r.status})")
 
@@ -122,6 +138,7 @@ async def download_video(link: str):
             f"⚠️ `{e}`"
         )
         raise
+
 
 
 
