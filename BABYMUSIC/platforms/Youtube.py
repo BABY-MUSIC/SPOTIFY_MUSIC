@@ -53,7 +53,7 @@ async def download_video(link: str):
         if os.path.exists(path):
             return path
     loop = asyncio.get_running_loop()
-    fetch = lambda: requests.get(f"{BASE_URL}/api/song?query={vid}&api={API_KEY}").json()
+    fetch = lambda: requests.get(f"{BASE_URL}/api/video?query={vid}&api={API_KEY}").json()
     res = await loop.run_in_executor(None, fetch)
     if not res:
         raise Exception("API Error")
