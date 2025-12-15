@@ -32,110 +32,57 @@ def cookie_txt_file():
     return cookie_file
 
 
-# ---------- AUDIO ----------
+# ---------- API SETUP ----------
+
+async def _download_media(link: str, kind: str, exts: list[str], wait: int = 60):
+    vid = link.split("v=")[-1].split("&")[0]
+    os.makedirs("downloads", exist_ok=True)
+
+    # 🔹 Local cache
+    for ext in exts:
+        path = f"downloads/{vid}.{ext}"
+        if os.path.exists(path):
+            return path
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"{BASE_URL}/api/{kind}?query={vid}&api={API_KEY}"
+            ) as resp:
+                res = await resp.json()
+
+            stream = res.get("stream")
+            if not stream:
+                raise Exception(f"{kind} stream not found")
+
+            # 🔹 Same check for song & video (NO HEAD / NO RANGE)
+            for _ in range(wait):
+                async with session.get(stream) as r:
+                    if r.status == 200:
+                        return stream
+                    if r.status in (202, 204, 404):
+                        await asyncio.sleep(2)
+                        continue
+                    raise Exception(f"{kind} failed ({r.status})")
+
+            raise Exception(f"{kind} processing timeout")
+
+    except Exception as e:
+        await app.send_message(
+            LOGGER_ID,
+            f"❌ **{kind.upper()} API ERROR**\n\n"
+            f"🔗 `{link}`\n"
+            f"⚠️ `{str(e)[:120]}`"
+        )
+        raise
+
+
 
 async def download_song(link: str):
-    vid = link.split("v=")[-1].split("&")[0]
-    os.makedirs("downloads", exist_ok=True)
-
-    for ext in ["mp3", "m4a", "webm"]:
-        path = f"downloads/{vid}.{ext}"
-        if os.path.exists(path):
-            return path
-
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                f"{BASE_URL}/api/song?query={vid}&api={API_KEY}"
-            ) as resp:
-                res = await resp.json()
-
-            if not res or not res.get("stream"):
-                raise Exception("Song stream not found")
-
-            stream_url = res["stream"]
-
-            for _ in range(60):
-                async with session.get(stream_url) as r:
-                    if r.status == 200:
-                        return stream_url
-                    elif r.status == 202:
-                        await asyncio.sleep(2)
-                    elif r.status in (204, 404):
-                        await asyncio.sleep(2)
-                    else:
-                        raise Exception(f"Stream failed ({r.status})")
-
-            raise Exception("Song processing timeout")
-
-    except Exception as e:
-        await app.send_message(
-            LOGGER_ID,
-            f"❌ **Song API Error**\n\n"
-            f"🔗 `{link}`\n"
-            f"⚠️ `{e}`"
-        )
-        raise
-
+    return await _download_media(link, "song", ["mp3", "m4a", "webm"])
 
 async def download_video(link: str):
-    vid = link.split("v=")[-1].split("&")[0]
-    os.makedirs("downloads", exist_ok=True)
-
-    # Local cache check
-    for ext in ["mp4", "webm", "mkv"]:
-        path = f"downloads/{vid}.{ext}"
-        if os.path.exists(path):
-            return path
-
-    try:
-        async with aiohttp.ClientSession() as session:
-            # API call for stream URL
-            async with session.get(
-                f"{BASE_URL}/api/video?query={vid}&api={API_KEY}"
-            ) as resp:
-                res = await resp.json()
-
-            if not res or not res.get("stream"):
-                raise Exception("Video stream not found")
-
-            stream_url = res["stream"]
-
-            # ✅ GET + Range (HEAD alternative)
-            for attempt in range(90):
-                async with session.get(
-                    stream_url,
-                    headers={"Range": "bytes=0-0"}
-                ) as r:
-                    if r.status in (200, 206):
-                        print(f"✅ Video ready after {attempt + 1} attempts")
-                        return stream_url
-
-                    elif r.status == 202:
-                        await asyncio.sleep(3)
-                        continue
-
-                    elif r.status in (204, 404):
-                        await asyncio.sleep(3)
-                        continue
-
-                    else:
-                        print(f"Attempt {attempt + 1}: Status {r.status}")
-                        await asyncio.sleep(3)
-
-            raise Exception("Video processing timeout (90 attempts)")
-
-    except Exception as e:
-        await app.send_message(
-            LOGGER_ID,
-            f"❌ **Video API Error**\n\n"
-            f"🔗 `{link}`\n"
-            f"⚠️ `{str(e)[:100]}`"
-        )
-        raise
-
-
-
+    return await _download_media(link, "video", ["mp4", "webm", "mkv"], wait=90)
 
 
 async def check_file_size(link):
