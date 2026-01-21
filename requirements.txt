@@ -23,7 +23,7 @@ lexica-api
 motor 
 MukeshAPI
 numpy<2.0.0
-openai==0.28.0
+openai==1.55.0
 opencv-python
 psutil
 pickledb
