@@ -43,9 +43,7 @@ async def _download_media(link: str, kind: str, exts: list[str], wait: int = 60)
             return path
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(
-                f"{BASE_URL}/api/{kind}?query={vid}&api={API_KEY}"
-            ) as resp:
+            async with session.get(f"{BASE_URL}/api/{kind}?query={vid}&api={API_KEY}") as resp:
                 res = await resp.json()
             stream = res.get("stream")
             if not stream:
@@ -54,11 +52,15 @@ async def _download_media(link: str, kind: str, exts: list[str], wait: int = 60)
                 async with session.get(stream) as r:
                     if r.status == 200:
                         return stream
-                    if r.status in (202, 204, 404):
+                    if r.status in (423, 404, 410):
                         await asyncio.sleep(2)
                         continue
+                    if r.status in (401, 403, 429):
+                        txt = await r.text()
+                        raise Exception(f"{kind} blocked {r.status}: {txt[:100]}")
                     raise Exception(f"{kind} failed ({r.status})")
             raise Exception(f"{kind} processing timeout")
+
     except Exception as e:
         await app.send_message(
             LOGGER_ID,
@@ -70,7 +72,7 @@ async def _download_media(link: str, kind: str, exts: list[str], wait: int = 60)
 
 
 async def download_song(link: str):
-    return await _download_media(link, "song", ["mp3", "m4a", "webm"])
+    return await _download_media(link, "song", ["mp3", "m4a", "webm"], wait=60)
 
 async def download_video(link: str):
     return await _download_media(link, "video", ["mp4", "webm", "mkv"], wait=90)
