@@ -3,7 +3,7 @@
 </h2>
 
 <p align="center">
-  <img src="BABYMUSIC/assets/assets/public.jpg" alt="BabyMusic Banner">
+  <img src="https://raw.githubusercontent.com/BABY-MUSIC/REPO_NAME/SPOTIFY_MUSIC/BABYMUSIC/assets/assets/public.jpg" alt="BabyMusic Banner">
 </p>
 
 <p align="center">
