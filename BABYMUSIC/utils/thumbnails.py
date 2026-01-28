@@ -1,4 +1,4 @@
 from config import *
 
-def get_thumb(videoid, chat_id=None):
+def get_thumb(videoid):
     return f"{IQ_Proxy}/{videoid}/mqdefault.jpg"
