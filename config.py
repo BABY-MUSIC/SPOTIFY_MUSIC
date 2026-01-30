@@ -6,9 +6,9 @@ from pyrogram import filters
 load_dotenv()
 # ------------------------------------
 # -----------------------------------------------------
-API_ID = int(getenv("API_ID", "0"))
-API_HASH = getenv("API_HASH", "0")
-BOT_TOKEN = getenv("BOT_TOKEN", "0")
+API_ID = int(getenv("API_ID", None))
+API_HASH = getenv("API_HASH", None)
+BOT_TOKEN = getenv("BOT_TOKEN", None)
 OWNER_USERNAME = getenv("OWNER_USERNAME","@UTTAM470")
 BOT_USERNAME = getenv("BOT_USERNAME" , "BABY_MUSIC09_BOT")
 BOT_NAME = getenv("BOT_NAME" , "╼⃝𖠁 𝐁ʌʙʏ ꭙ 𝐌ᴜsɪᴄ 𖠁⃝╾")
@@ -19,8 +19,8 @@ API_KEY = getenv("API_KEY", None)
 # ---------------------------------------------------------
 MONGO_DB_URI = getenv("MONGO_DB_URI", "mongodb+srv://TEAMBABY01:UTTAMRATHORE09@cluster0.vmjl9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 17000))
-LOGGER_ID = int(getenv("LOGGER_ID", "0"))
-OWNER_ID = int(getenv("OWNER_ID", "0"))
+LOGGER_ID = int(getenv("LOGGER_ID", None))
+OWNER_ID = int(getenv("OWNER_ID", None))
 HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 HEROKU_API_KEY = getenv("HEROKU_API_KEY")
 UPSTREAM_REPO = getenv(
