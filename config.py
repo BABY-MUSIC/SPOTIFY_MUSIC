@@ -14,7 +14,7 @@ BOT_USERNAME = getenv("BOT_USERNAME" , "BABY_MUSIC09_BOT")
 BOT_NAME = getenv("BOT_NAME" , "╼⃝𖠁 𝐁ʌʙʏ ꭙ 𝐌ᴜsɪᴄ 𖠁⃝╾")
 ASSUSERNAME = getenv("ASSUSERNAME" , "╼⃝𖠁 𝐁ʌʙʏ ꭙ 𝐌ᴜsɪᴄ 𖠁⃝╾")
 # ---------------------------------------------------------
-BASE_URL = getenv("BASE_URL", "https://babyapi.pro")
+BASE_URL = getenv("BASE_URL", "http://127.0.0.1")
 API_KEY = getenv("API_KEY", None)
 # ---------------------------------------------------------
 MONGO_DB_URI = getenv("MONGO_DB_URI", "mongodb+srv://TEAMBABY01:UTTAMRATHORE09@cluster0.vmjl9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
